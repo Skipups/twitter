@@ -5,6 +5,8 @@ const dotenv = require('dotenv').config();
 const mongoose = require('mongoose');
 const port = process.env.PORT || 5000;
 const bodyParser = require('body-parser');
+const User = require('./models/User');
+const passport = require('passport');
 
 const users = require('./routes/api/users');
 const tweets = require('./routes/api/tweets');
@@ -14,12 +16,27 @@ mongoose
     useUnifiedTopology: true,
     useNewUrlParser: true,
   })
-  .then(() => console.log(chalk.green('Connected to MongoDb successfully')))
+  .then(() => console.log(chalk.green(`Connected to MongoDb successfully! `)))
   .catch((err) => console.log(err));
 
+app.use(
+  bodyParser.urlencoded({
+    extended: false,
+  })
+);
+
+app.use(bodyParser.json());
+app.use(passport.initialize());
+require('./config/passport')(passport);
+
 app.get('/', (req, res) => {
-  console.log(res);
-  res.send('Hello');
+  const user = new User({
+    handle: 'Lana',
+    email: 'svet@gmail.com',
+    password: '123asd',
+  });
+  user.save();
+  res.send('hello world');
 });
 
 //middleware for parsing json objects
